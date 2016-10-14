@@ -79,6 +79,9 @@ function! s:AutoRead(file) "{{{1
   if !executable('tail')
     call s:StoreMessage('tail not found')
     return
+  elseif !filereadable(file)
+    call s:StoreMessage(printf('File "%s" not readable', a:file))
+    return
   endif
   let cmd=printf('tail -f -- %s', file)
   norm! G
