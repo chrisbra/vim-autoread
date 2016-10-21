@@ -89,7 +89,7 @@ function! s:AutoRead(bang, file) "{{{1
     call s:StoreMessage(printf('File "%s" not readable', a:file))
     return
   endif
-  let cmd=printf('tail -f -- %s', file)
+  let cmd=printf('tail -n0 -f -- %s', file)
   norm! G
   call s:ReadOutputAsync(cmd, file, bufnr(''))
 endfunction
