@@ -25,9 +25,15 @@ let g:loaded_autoread = 1
 
 let s:jobs = {}
 
-function! s:on_exit(channel) dict abort "{{{1
+function! s:autoread_on_exit(channel) dict abort "{{{1
   " Remove from s:jobs
   call remove(s:jobs, self.file)
+endfunction
+
+function! s:autoread_on_error(channel, msg) dict abort "{{{1
+  echohl ErrorMsg
+  echom a:msg
+  echohl None
 endfunction
 
 function! s:ReadOutputAsync(cmd, file, buffer) "{{{1
@@ -48,10 +54,10 @@ function! s:ReadOutputAsync(cmd, file, buffer) "{{{1
   endif
   call s:StoreMessage(printf("Starting Job for file %s buffer %d", a:file, a:buffer))
   let id = job_start(cmd, {
-    \ 'err_io':   'out',
     \ 'out_io':   'buffer',
     \ 'out_buf':  a:buffer,
-    \ 'close_cb': function('s:on_exit', options)})
+    \ 'close_cb': function('s:autoread_on_exit', options),
+    \ 'err_cb':   function('s:autoread_on_error', options)})
   let s:jobs[a:file] = id
 endfu
 
