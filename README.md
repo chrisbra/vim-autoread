@@ -25,6 +25,7 @@ Here is a short overview of the functionality provided by the plugin:
 ####Ex commands:
     :AutoRead     - starts a async job and will append new buffer content
                     to the current buffer once it is noticed.
+    :AutoRead!    - stop autoreading
 
 Tip
 ---

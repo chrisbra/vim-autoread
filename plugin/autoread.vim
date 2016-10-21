@@ -74,8 +74,14 @@ function! s:OutputMessage() "{{{1
   endif
 endfu
 
-function! s:AutoRead(file) "{{{1
+function! s:AutoRead(bang, file) "{{{1
   let file=fnamemodify(a:file, ':p')
+  if !empty(a:bang)
+    if has_key(s:jobs, file)
+      call job_stop(s:jobs[file])
+    endif
+    return
+  endif
   if !executable('tail')
     call s:StoreMessage('tail not found')
     return
@@ -88,6 +94,7 @@ function! s:AutoRead(file) "{{{1
   call s:ReadOutputAsync(cmd, file, bufnr(''))
 endfunction
 
-com! AutoRead :call s:AutoRead(expand('%'))
+" Commands: {{{1 
+com! -bang AutoRead :call s:AutoRead(<q-bang>, expand('%'))
 
 " vim: ts=2 sts=2 sw=2 et fdm=marker com+=l\:\"
