@@ -82,14 +82,17 @@ endfu
 
 function! s:AutoRead(bang, file) "{{{1
   let file=fnamemodify(a:file, ':p')
+  let buff=bufnr('%')
+  let agroup='vim-autoread-'.buff
+  let agroup_cmd='augroup '.agroup
   if !empty(a:bang)
     if has_key(s:jobs, file)
       call job_stop(s:jobs[file])
     endif
-    augroup vim-autoread
+    exe agroup_cmd
       au!
     augroup end
-    augroup! vim-autoread
+    exe "augroup!" agroup
     return
   endif
   if !executable('tail')
@@ -101,8 +104,8 @@ function! s:AutoRead(bang, file) "{{{1
   endif
   let cmd=printf('tail -n0 -F -- %s', file)
   norm! G
-  if !exists("#vim-autoread#FileChangedShell")
-    augroup vim-autoread
+  if !exists("#".agroup."#FileChangedShell")
+    exe agroup_cmd
       au! FileChangedShell <buffer> :let v:fcs_choice='reload'
     augroup end
   endif
