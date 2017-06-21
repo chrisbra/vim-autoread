@@ -60,12 +60,12 @@ function! s:autoread_cb(channel, msg) dict abort "{{{1
     call setline(1, a:msg)
   else
     call append('$', a:msg)
-    if switch_buffer
-      exe "noa ". curtabnr. "tabnext"
-      exe "noa ". curwinnr. "wincmd w"
-    else
-      norm! G
-    endif
+  endif
+  if switch_buffer
+    exe "noa ". curtabnr. "tabnext"
+    exe "noa ". curwinnr. "wincmd w"
+  else
+    norm! G
   endif
   call s:OutputMessage()
 endfunction
