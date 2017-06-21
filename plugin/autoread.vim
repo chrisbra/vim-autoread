@@ -52,7 +52,7 @@ function! s:autoread_cb(channel, msg) dict abort "{{{1
   endif
   let fsize = getfsize(self.file)
   if fsize < get(b:, 'autoread_fsize', 0)
-    call s:StoreMessage('Truncating Buffer, as file seemed to have changed')
+    call s:StoreMessage('Truncating Buffer, as file seemed to have changed', 'error')
     sil! %d
   endif
   let b:autoread_fsize = fsize
@@ -71,7 +71,7 @@ function! s:autoread_cb(channel, msg) dict abort "{{{1
 endfunction
 
 function! s:autoread_on_error(channel, msg) dict abort "{{{1
-  call s:StoreMessage(a:msg)
+  call s:StoreMessage(a:msg, 'error')
   echohl ErrorMsg
   echom a:msg
   echohl None
@@ -83,17 +83,13 @@ function! s:ReadOutputAsync(cmd, file, buffer) "{{{1
   else
     let cmd = ['sh', '-c', a:cmd]
   endif
-  if empty(a:file)
-    call s:StoreMessage("Buffername empty")
-    return
-  endif
 
   let options = {'file': a:file, 'cmd': a:cmd, 'buffer': a:buffer}
   if has_key(s:jobs, a:file) && job_status(get(s:jobs, a:file)) == 'run'
-    call s:StoreMessage("Job still running")
+    call s:StoreMessage("Job still running", 'error')
     return
   endif
-  call s:StoreMessage(printf("Starting Job for file %s buffer %d", a:file, a:buffer))
+  call s:StoreMessage(printf("Starting Job for file %s buffer %d", a:file, a:buffer), 'warning')
   let id = job_start(cmd, {
     \ 'out_io':   'buffer',
     \ 'out_cb':   function('s:autoread_cb', options),
@@ -102,27 +98,36 @@ function! s:ReadOutputAsync(cmd, file, buffer) "{{{1
   let s:jobs[a:file] = id
 endfu
 
-function! s:StoreMessage(msg) "{{{1
-  if !exists("s:msg")
-    let s:msg = []
+function! s:StoreMessage(msg, type) "{{{1
+  if !exists("s:msg_{a:type}")
+    let s:msg_{a:type} = []
   endif
-  call add(s:msg, a:msg)
+  call add(s:msg_{a:type}, a:msg)
 endfu
 
 function! s:OutputMessage() "{{{1
-  if empty(s:msg)
-    return
-  endif
-  " Always store messages in history
-  if get(g:, 'autoread_debug', 0)
-    let i=0
-    for line in s:msg
-      echom (i == 0 ? 'vim-autoread: ' : ''). line
-      let i += 1
-    endfor
-    " Add last message to error message
-    let v:errmsg = line
-  endif
+  for type in ['warning', 'error']
+    if !exists("s:msg_{type}")
+      continue
+    endif
+    let msg=s:msg_{type}
+    if empty(msg)
+      continue
+    endif
+    " Always store messages in history
+    if get(g:, 'autoread_debug', 0) || type ==# 'error'
+      let i=0
+      for line in msg
+        echom (i == 0 ? ('vim-autoread:'.toupper(type[0]).':') : ''). line
+        let i += 1
+      endfor
+      " Add last message to error message
+      if type ==# 'error'
+        let v:errmsg = line
+      endif
+    endif
+    unlet! s:msg_{type}
+  endfor
 endfu
 
 function! s:AutoRead(bang, file) "{{{1
@@ -141,10 +146,13 @@ function! s:AutoRead(bang, file) "{{{1
     return
   endif
   if !executable('tail')
-    call s:StoreMessage('tail not found')
+    call s:StoreMessage('tail not found', 'error')
+    return
+  elseif empty(file)
+    call s:StoreMessage(printf('Filename "%s" not given', file), 'error')
     return
   elseif !filereadable(file)
-    call s:StoreMessage(printf('File "%s" not readable', a:file))
+    call s:StoreMessage(printf('File "%s" not readable', a:file), 'error')
     return
   endif
   let cmd=printf('tail -n0 -F -- %s', file)
