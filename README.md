@@ -19,7 +19,7 @@ That directory will be loaded automatically by Vim.
 
 ## Usage
 ---
-Once installed, take a look at the help at `:h vim-autoread` (not yet available).
+Once installed, take a look at the help at `:h vim-autoread`.
 
 Here is a short overview of the functionality provided by the plugin:
 
@@ -28,11 +28,6 @@ Here is a short overview of the functionality provided by the plugin:
     :AutoRead     - starts a async job and will append new buffer content
                     to the current buffer once it is noticed.
     :AutoRead!    - stop autoreading
-
-## Tip
----
-If you want to Vim scroll automatically, make sure to have the cursor already on the last
-line (e.g. using `G` command) when you call `:AutoRead`.
 
 ## License & Copyright
 -------

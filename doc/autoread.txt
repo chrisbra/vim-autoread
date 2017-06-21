@@ -1,0 +1,31 @@
+*autoread.txt* Automatically update a buffer as it is changed
+
+Author:  Christian Brabandt <cb@256bit.org>
+Version: 0.2
+Copyright: (c) 2016-2017 by Christian Brabandt
+           The VIM LICENSE applies to the autoread plugin
+           (see |copyright|) except use autoread instead of "Vim".
+           NO WARRANTY, EXPRESS OR IMPLIED.  USE AT-YOUR-OWN-RISK.
+
+==============================================================================
+                                                              *vim-autoread*
+
+Vim-autoread is a plugin to automatically re-read your buffers, as it changes.
+
+It uses Vim 8 feature of async jobs to append new buffer content as it appears.
+Internally, it works by running tail -f on a file and the output will be appended
+to the buffer, which displays this file.
+Note: this needs the command tail in your path (so probably won't work on
+Windows).
+
+Since it relies heavily on the |job| feature of Vim, it needs at least Vim
+Version 8 to work.
+
+                                                                    *:AutoRead*
+:AutoRead[!]    Starts a new async job and will append output to the current
+                buffer as it appears in the background. The buffer will be
+                scrolled automatically.
+                If ! is given, stop auto-reading.
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:et:fdm=marker:fdl=0:norl
