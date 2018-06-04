@@ -10,6 +10,9 @@ function! s:autoread_cb(channel, msg) dict abort "{{{1
   if bufnr('%') != self.buffer
     " switch to buffer
     let bufinfo = getbufinfo(self.buffer)
+    if len(bufinfo[0].windows) == 0
+      return
+    endif
     let winfo   = getwininfo(bufinfo[0].windows[0])
     let winnr   = winfo[0].winnr
     let tabnr   = winfo[0].tabnr
