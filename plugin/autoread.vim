@@ -24,4 +24,7 @@ let g:loaded_autoread = 1
 " Commands: {{{1 
 com! -bang AutoRead :call autoread#AutoRead(<q-bang>, expand('%'))
 
+" Reset cpo
+let &cpo=s:cpo
+
 " vim: ts=2 sts=2 sw=2 et fdm=marker com+=l\:\"
