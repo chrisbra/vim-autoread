@@ -12,6 +12,9 @@
 let s:cpo= &cpo
 if exists("g:loaded_autoread") || &cp
   finish
+elseif has("nvim")
+  " disabled for neovim, because it uses a different API
+  finish
 elseif !has('job')
   echohl WarningMsg
   echomsg "The vim-autoread Plugin needs at least a Vim version 8 (with +job feature)"
