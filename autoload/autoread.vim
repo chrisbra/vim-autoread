@@ -41,11 +41,10 @@ function! s:autoread_cb(channel, msg) dict abort "{{{1
   else
     call append('$', a:msg)
   endif
+  norm! G
   if switch_buffer
     exe "noa ". curtabnr. "tabnext"
     exe "noa ". curwinnr. "wincmd w"
-  else
-    norm! G
   endif
   call s:OutputMessage()
 endfunction
